@@ -1,0 +1,163 @@
+PDefs. Program ::= [Def] ;
+
+terminator Def "" ;
+
+comment "//" ;
+comment "/*" "*/" ;
+comment "#" ;
+
+DFun.      Def ::= "inline" SetType ScopeName "(" [Arg] ")" FunRest ;
+DFun1.     Def ::= SetType ScopeName "(" [Arg] ")" FunRest  ;
+DFunRest.  FunRest ::= Stm ;
+DFunRest2. FunRest ::= ";" ;
+
+
+
+DUs.	   Def ::= "using" SetType ";" ;
+DTypeDef.  Def ::= "typedef"  SetType Id ";" ;
+
+DDecl.     Def ::= SetType [ScopeName] ";" ;
+
+DInit.     Def ::= SetType ScopeName "=" Exp ";" ;
+
+DStruct.   Def ::= "struct" ScopeName "{" [StructDecl] "}" ";" ;
+StructDecl. StructDecl ::= SetType Id ;
+terminator StructDecl ";" ;
+
+-------------------------------------------------------------------------
+
+Arg1. Arg ::= SetType ;
+Arg2. Arg ::= SetType ScopeName ;
+Arg3. Arg ::= SetType ScopeName "=" Lit ;
+Arg4. Arg ::= SetType ScopeName "=" Id ;
+
+separator  Arg "," ;
+
+-------------------------------------------------------------------------
+
+SetType.   SetType  ::= TypeName ;
+SetTypeCT. SetType  ::= "const" TypeName ;
+
+TypeName.   TypeName ::= TypeId ;
+TypeName1.  TypeName ::= TypeId "&" ;
+
+TypeId.   TypeId ::= Type ;
+TypeId1.  TypeId ::= ScopeName ;
+
+separator nonempty SetType "," ;
+
+-------------------------------------------------------------------------
+
+ScopeName.  ScopeName  ::= [ScopeNamePart] ;
+separator nonempty ScopeName "," ;
+
+ScopeNamePart. ScopeNamePart ::= [ScopePart] TemplPart ;
+separator nonempty ScopeNamePart "::" ;
+
+ScopePart.  ScopePart  ::= Id ;
+separator nonempty ScopePart "::" ;
+
+TemplPart.  TemplPart  ::= "<"TemplIns">" ;
+TemplIns.   TemplIns   ::= Type ;
+TemplIns1.  TemplIns   ::= [ScopeParts] ;
+TemplPart2. TemplPart  ::= ;
+ScopeParts. ScopeParts ::= [ScopeNamePart] ;
+separator nonempty ScopeParts "," ;
+
+-------------------------------------------------------------------------
+
+terminator   Stm "" ;
+SExp.        Stm ::= Exp ";" ;
+SBlock.      Stm ::= "{" [Stm1] "}" ;
+
+terminator Stm1 "" ;
+
+SExpI.       Stm1 ::= Exp ";" ;
+SDecl.       Stm1 ::=           SetType [ScopeName] ";" ;
+SInit.       Stm1 ::=           SetType  ScopeName "=" Exp ";" ;
+STypeDef.    Stm1 ::= "typedef" ScopeName [ScopeName] ";" ;
+SStruct.     Stm1 ::= "struct" ScopeName "{" [StructDecl] "}" ";" ;
+SReturn.     Stm1 ::= "return" Exp ";" ;
+SStmIns.     Stm1 ::= "{" [Stm1] "}" ;
+
+-------------------------------------------------------------------------
+
+SWhile.  Stm1       ::= "while" "(" Exp ")" WhileRest ;
+WhileR1. WhileRest ::= ";" ;
+WhileR2. WhileRest ::= Stm1 ;
+
+SDo.    Stm1 ::= "do" Stm1 "while" "(" Exp ")" ";" ;
+
+
+SIf. 	  Stm1   ::=  "if" "(" Exp ")" Stm1 IfRest ;
+IfRest.   IfRest ::=  "else" Stm1 ;
+IfRest1.  IfRest ::=  ;
+
+SForF.   Stm1 ::= "for" "(" TypeName Exp ";" Exp ";" Exp ")" ForRest ;
+ForRest. ForRest ::= Stm ;
+ForRest1. ForRest ::= ";" ;
+
+EStr.    Exp16 ::= Lit ;
+EId.     Exp16 ::= ScopeName ;
+
+EApp.    Exp15 ::= ScopeName"(" [AppArg] ")" ;
+AppArg.  AppArg ::= Exp ;
+separator AppArg "," ;
+
+EInd.    Exp15 ::= ScopeName"["Exp"]" ;
+
+EPIncr.  Exp14 ::= Exp15 "++" ;
+EPDecr.  Exp14 ::= Exp15 "--" ;
+EDot.    Exp14 ::= Exp14"."Exp15 ;
+EArrow.  Exp14 ::= Exp14"->"Exp15 ;
+
+EIncr.   Exp13 ::= "++" Exp14 ;
+EDecr.   Exp13 ::= "--" Exp14 ;
+EExcl.	 Exp13 ::= "!"  Exp14 ;
+EPnt.	 Exp13 ::= "*"  Exp14 ;
+
+ETimes.  Exp12 ::= Exp12 "*"  Exp13 ;
+EDiv.    Exp12 ::= Exp12 "/"  Exp13 ;
+EDiv.    Exp12 ::= Exp12 "%"  Exp13 ;
+EPlus.   Exp11 ::= Exp11 "+"  Exp12 ;
+EMinus.  Exp11 ::= Exp11 "-"  Exp12 ;
+EBLsh.	 Exp10  ::= Exp10  "<<" Exp11 ;
+EBRsh.	 Exp10  ::= Exp10  ">>" Exp11 ;
+ELt.     Exp9  ::= Exp9  "<"  Exp10 ;
+EGt.     Exp9  ::= Exp9  ">"  Exp10 ;
+ELtEq.   Exp9  ::= Exp9  "<=" Exp10 ;
+EGtWq.   Exp9  ::= Exp9  ">=" Exp10 ;
+EEq.     Exp8  ::= Exp9  "==" Exp9 ;
+ENEq.    Exp8  ::= Exp9  "!=" Exp9 ;
+
+EAnd.     Exp4  ::= Exp4  "&&" Exp5 ;
+EOr.      Exp3  ::= Exp3  "||" Exp4 ;
+EAss.     Exp2  ::= Exp3  "="  Exp2 ; --
+EAssPl.   Exp2  ::= Exp3  "-="  Exp2 ;
+EAssMin.  Exp2  ::= Exp3  "+="  Exp2 ;
+ECondAss. Exp2  ::= Exp3  "?"  Exp2 ":" Exp1 ; -- 
+
+EThrow.  Exp1 ::= "throw" Exp2 ;
+
+coercions Exp 16 ;
+separator Exp "," ;
+
+-------------------------------------------------------------------------
+
+TypeBool.   Type ::= "bool" ;
+TypeInt.    Type ::= "int"  ;
+TypeDouble. Type ::= "double" ;
+TypeVoid.   Type ::= "void" ;
+
+LitString.  Lit ::= [String] ; 
+separator nonempty String "" ;
+LitInteger. Lit ::= Integer ;
+LitDouble.  Lit ::= Double ;
+LitChar.    Lit ::= Char ;
+LitTrue.    Lit ::= "true" ;
+LitFalse.   Lit ::= "false" ;
+
+token Id (letter (letter | digit | '_')*) ;
+separator nonempty Id "," ;
+
+-------------------------------------------------------------------------

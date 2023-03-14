@@ -1,0 +1,115 @@
+PDefs. Program ::= [Def] ;
+
+terminator Def "" ;
+
+comment "//" ;
+comment "/*" "*/" ;
+comment "#" ;
+
+DFun.      Def ::= TypeName Id "(" [Arg] ")" "{" [Stm] "}" ;
+DFun1.     Def ::= "inline" TypeName Id "(" [Arg] ")" "{" [Stm] "}" ;
+DUs.	   Def ::= "using" TypeName ";" ;
+
+-------------------------------------------------------------------------
+
+ADecl.    Arg ::= ArgType     Id ;
+ADeclP1.  Arg ::= ArgType"&"  Id ;
+ADeclP2.  Arg ::= ArgType "&" Id ;
+ADeclP3.  Arg ::= ArgType  "&"Id ;
+
+AType.  ArgType ::= TypeName ;
+ATypeC. ArgType ::= "const" TypeName ;
+
+separator  Arg "," ;
+
+-------------------------------------------------------------------------
+
+ESc	PtVI.  EScPV  ::= Id ;
+EScPtVT.  EScPV ::= Type ;
+EScPt.    EScP  ::= EScPV ;
+EScPtT.   EScP  ::= EScPV"<"EScPV">" ;
+separator EScP "::" ;
+
+TypeNameType.     TypeName ::= EScP ;
+TypeNameTypeSc.   TypeName ::= EScP"::"EScP ;
+TypeNameTypeScs.  TypeName ::= EScP"::"[EScP] ;
+
+-------------------------------------------------------------------------
+
+terminator Stm "" ;
+SExp.  Stm ::= Exp ";" ;
+
+SDecl.       Stm ::=           TypeName Id ";" ;
+SDecls.      Stm ::=           TypeName Id "," [Id] ";" ;
+SInit.       Stm ::=           TypeName Id "=" Exp ";" ;
+STypeDef.    Stm ::= "typedef" TypeName Id ";" ;
+STypeDefs.   Stm ::= "typedef" TypeName Id "," [Id] ";" ;
+
+-------------------------------------------------------------------------
+
+-- TODO Define multiple initializations
+
+SReturn. Stm ::= "return" Exp ";" ;
+SThrow.  Stm ::= "throw"  Exp ";" ;
+SWhile.  Stm ::= "while" "(" Exp ")" Stm ;
+SBlock.  Stm ::= "{" [Stm] "}" ;
+SIfElse. Stm ::= "if" "(" Exp ")" Stm "else" Stm ;
+SIf.	 Stm ::= "if" "(" Exp ")" Stm ;
+
+EStr.    Exp16 ::= String ;
+EStrs.   Exp16 ::= String [String];
+separator String " ";
+EInt.    Exp16 ::= Integer ;
+EDouble. Exp16 ::= Double ;
+ETrue.   Exp16 ::= "true" ;
+EFalse.  Exp16 ::= "false" ;
+
+EId.      Exp16 ::= EScP ;
+ESc.	  Exp16 ::= EScP"::"EScP ;
+EScL.	  Exp16 ::= EScP"::"[EScP] ;
+
+EApp.    Exp15 ::= EScP "(" [Exp] ")" ;
+EInd.    Exp15 ::= EScP"["Exp"]" ;
+
+EPIncr.  Exp14 ::= Exp15 "++" ;
+EPDecr.  Exp14 ::= Exp15 "--" ;
+EDot.    Exp14 ::= Exp14"."Exp15 ;
+
+EIncr.   Exp13 ::= "++" Exp14 ;
+EIncr.   Exp13 ::= "--" Exp14 ;
+
+ETimes.  Exp12 ::= Exp12 "*"  Exp13 ;
+EDiv.    Exp12 ::= Exp12 "/"  Exp13 ;
+EDiv.    Exp12 ::= Exp12 "%"  Exp13 ;
+EPlus.   Exp11 ::= Exp11 "+"  Exp12 ;
+EMinus.  Exp11 ::= Exp11 "-"  Exp12 ;
+EBLsh.	 Exp10  ::= Exp10  "<<" Exp11 ;
+EBRsh.	 Exp10  ::= Exp10  ">>" Exp11 ;
+ELt.     Exp9  ::= Exp9  "<"  Exp10 ;
+EGt.     Exp9  ::= Exp9  ">"  Exp10 ;
+ELtEq.   Exp9  ::= Exp9  "<=" Exp10 ;
+EGtWq.   Exp9  ::= Exp9  ">=" Exp10 ;
+EEq.     Exp8  ::= Exp8  "==" Exp9 ;
+ENEq.    Exp8  ::= Exp8  "!=" Exp9 ;
+
+EAnd.     Exp4  ::= Exp4  "&&" Exp5 ;
+EOr.      Exp3  ::= Exp3  "||" Exp4 ;
+EAss.     Exp2  ::= Exp3  "="  Exp2 ;
+ECondAss. Exp2  ::= Exp3  "?"  Exp2 ":" Exp1 ;
+
+coercions Exp 16 ;
+separator Exp "," ;
+
+
+-------------------------------------------------------------------------
+
+Tbool.   Type ::= "bool" ;
+Tdouble. Type ::= "double" ;
+Tint.    Type ::= "int" ;
+Tvoid.   Type ::= "void" ;
+Tstring. Type ::= "string" ;
+
+token Id (letter (letter | digit | '_')*) ;
+separator Id "," ;
+
+-------------------------------------------------------------------------
